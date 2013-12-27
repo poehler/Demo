@@ -34,20 +34,6 @@
     <cfif not isDefined("arguments.channel_id") or not isValid("numeric", arguments.channel_id)>
         <cfset arguments.channel_id = 0>
     </cfif>
-    <cfsavecontent variable="goob">
-        <cfoutput>
-insert into audit_messages
-       (user_id, type, msg, location_id, gateway_id, device_id, channel_id, audit_date)
-values ('#arguments.user_id#',
-        '#arguments.type#',
-        '#left(arguments.message, 5000)#',
-        '#arguments.location_id#',
-        '#arguments.gateway_id#',
-        '#arguments.device_id#',
-        '#arguments.channel_id#',
-        now())
-        </cfoutput>
-    </cfsavecontent>
     <cfquery name="i_audit_messages" datasource="#application.datasource#">
 insert into audit_messages
        (user_id, type, msg, location_id, gateway_id, device_id, channel_id, audit_date)

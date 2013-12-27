@@ -1,19 +1,12 @@
 component restpath="/users" rest="true"{
-    remote any function usersList(string user_id=0 restargsource="Header",
-                                  string session_id=0 restargsource="Header") httpmethod="GET" {
-        var searchColumns = ["username", "lname","fname", "addr1", "addr2", "city", "state", "zip", "country", "phone", "phone2", "email"];
-        var rtn = {};
-        rtn.users = [];
-        rtn.cmd = {};
-        rtn.cmd.code = 200;
-
-        var user = application.security.validateSession(arguments.user_id, arguments.session_id);
-
+    remote any function usersList(string user_id restargsource="Header", string session_id restargsource="Header") httpmethod="GET" {
+        user = application.security.validateSession(arguments.user_id, arguments.session_id);
         if(user.user_id lte 0) {
+            rtn = {};
+            rtn.users = [];
+            rtn.cmd = {};
             rtn.cmd.code = 301;
             rtn.cmd.message = "Unauthorized Session";
-            rtn.user = user;
-            return rtn;
         }
         if(isDefined("url.from") and isValid("numeric", url.from))
             arguments.from = url.from;
@@ -34,6 +27,13 @@ component restpath="/users" rest="true"{
             arguments.search = url.search;
         else
             arguments.search = "";
+
+        searchColumns = ["username", "lname","fname", "addr1", "addr2", "city", "state", "zip", "country", "phone", "phone2", "email"];
+
+        rtn = {};
+        rtn.users = [];
+        rtn.cmd = {};
+        rtn.cmd.code = 200;
 
         try {
             include "users/sql_s_users_01.cfm";
@@ -68,22 +68,7 @@ component restpath="/users" rest="true"{
         }
     }
 
-    remote any function usersRecord(string user_id=0 restargsource="Header",
-                                    string session_id=0 restargsource="Header",
-                                    string id restargsource="Path") httpmethod="GET" restpath="{id}" {
-        var searchColumns = ["username", "lname","fname", "addr1", "addr2", "city", "state", "zip", "country", "phone", "phone2", "email"];
-        var rtn = {};
-        rtn.users = [];
-        rtn.cmd = {};
-        rtn.cmd.code = 200;
-
-        var user = application.security.validateSession(arguments.user_id, arguments.session_id);
-
-        if(user.user_id lte 0) {
-            rtn.cmd.code = 301;
-            rtn.cmd.message = "Unauthorized Session";
-            return rtn;
-        }
+    remote any function usersRecord(string id restargsource="Path") httpmethod="GET" restpath="{id}" {
 
         if(not isValid("numeric", arguments.id)){
             rtn = {};
@@ -93,6 +78,13 @@ component restpath="/users" rest="true"{
             rtn.cmd.message = "Invalid ID";
             return rtn;
         }
+
+        searchColumns = ["username", "lname","fname", "addr1", "addr2", "city", "state", "zip", "country", "phone", "phone2", "email"];
+
+        rtn = {};
+        rtn.users = [];
+        rtn.cmd = {};
+        rtn.code = 200;
 
         try {
             include "users/sql_s_users_02.cfm";
@@ -123,36 +115,27 @@ component restpath="/users" rest="true"{
         }
     }
 
-    remote any function usersINSERT(string user_id=0 restargsource="Header",
-                                    string session_id=0 restargsource="Header",
-                                    string userName restargsource="Form",
-                                    string password restargsource="Form",
-                                    string fName restargsource="Form",
-                                    string lName restargsource="Form",
-                                    string addr1 restargsource="Form",
-                                    string addr2 restargsource="Form",
-                                    string city restargsource="Form",
-                                    string state restargsource="Form",
-                                    string zip restargsource="Form",
-                                    string country restargsource="Form",
-                                    string phone restargsource="Form",
-                                    string phone2 restargsource="Form",
-                                    string email restargsource="Form",
-                                    string status_cde restargsource="Form",
-                                    string type restargsource="Form") httpmethod="POST" {
-        var searchColumns = ["username", "lname","fname", "addr1", "addr2", "city", "state", "zip", "country", "phone", "phone2", "email"];
-        var rtn = {};
+    remote any function usersINSERT(string userName restargsource="Form",
+                                  string password restargsource="Form",
+                                  string fName restargsource="Form",
+                                  string lName restargsource="Form",
+                                  string addr1 restargsource="Form",
+                                  string addr2 restargsource="Form",
+                                  string city restargsource="Form",
+                                  string state restargsource="Form",
+                                  string zip restargsource="Form",
+                                  string country restargsource="Form",
+                                  string phone restargsource="Form",
+                                  string phone2 restargsource="Form",
+                                  string email restargsource="Form",
+                                  string status_cde restargsource="Form",
+                                  string type restargsource="Form") httpmethod="POST" {
+
+        rtn = {};
         rtn.users = [];
         rtn.cmd = {};
+        rtn.cmd.method = "POST";
         rtn.cmd.code = 200;
-
-        var user = application.security.validateSession(arguments.user_id, arguments.session_id);
-
-        if(user.user_id lte 0) {
-            rtn.cmd.code = 301;
-            rtn.cmd.message = "Unauthorized Session";
-            return rtn;
-        }
 
         if(not isDefined("arguments.userName") or len(arguments.userName) eq 0){
             rtn.cmd.code = 300;
@@ -216,8 +199,10 @@ component restpath="/users" rest="true"{
             arguments.type = "U";
         }
 
-        var salt = application.crypto.genSalt();
-        var hashedPassword = application.crypto.computeHash(arguments.password, salt);
+        salt = application.crypto.genSalt();
+        hashedPassword = application.crypto.computeHash(arguments.password, salt);
+
+        searchColumns = ["username", "lname","fname", "addr1", "addr2", "city", "state", "zip", "country", "phone", "phone2", "email"];
 
         try {
             include "users/sql_i_users_01.cfm";
@@ -230,7 +215,7 @@ component restpath="/users" rest="true"{
                 return rtn;
             }
 
-            var usr = {};
+            usr = {};
             usr.id = s_users.user_id;
             for(jj=1; jj lte arrayLen(searchColumns); jj=jj+1) {
                 targetColumn = searchColumns[jj];
@@ -251,40 +236,30 @@ component restpath="/users" rest="true"{
         return rtn;
     }
 
-    remote any function usersUPDATE(string user_id=0 restargsource="Header",
-                                    string session_id=0 restargsource="Header",
-                                    string id restargsource="Header",
-                                    string userName restargsource="Header",
-                                    string password restargsource="Header",
-                                    string password2 restargsource="Header",
-                                    string fName restargsource="Header",
-                                    string lName restargsource="Header",
-                                    string addr1 restargsource="Header",
-                                    string addr2 restargsource="Header",
-                                    string city restargsource="Header",
-                                    string state restargsource="Header",
-                                    string zip restargsource="Header",
-                                    string country restargsource="Header",
-                                    string phone restargsource="Header",
-                                    string phone2 restargsource="Header",
-                                    string email restargsource="Header",
-                                    string status_cde restargsource="Header",
-                                    string type restargsource="Header") httpmethod="PUT" {
+        remote any function usersUPDATE(string id restargsource="Header",
+                                  string userName restargsource="Header",
+                                  string password restargsource="Header",
+                                  string password2 restargsource="Header",
+                                  string fName restargsource="Header",
+                                  string lName restargsource="Header",
+                                  string addr1 restargsource="Header",
+                                  string addr2 restargsource="Header",
+                                  string city restargsource="Header",
+                                  string state restargsource="Header",
+                                  string zip restargsource="Header",
+                                  string country restargsource="Header",
+                                  string phone restargsource="Header",
+                                  string phone2 restargsource="Header",
+                                  string email restargsource="Header",
+                                  string status_cde restargsource="Header",
+                                  string type restargsource="Header") httpmethod="PUT" {
 
-        var searchColumns = ["username", "lname","fname", "addr1", "addr2", "city", "state", "zip", "country", "phone", "phone2", "email"];
-        var rtn = {};
+        rtn = {};
         rtn.users = [];
         rtn.cmd = {};
+        rtn.cmd.method = "PUT";
         rtn.cmd.code = 200;
-
-        var user = application.security.validateSession(arguments.user_id, arguments.session_id);
-
-        if(user.user_id lte 0) {
-            rtn.cmd.code = 301;
-            rtn.cmd.message = "Unauthorized Session";
-            return rtn;
-        }
-
+dump("#arguments#");
         if(not isDefined("arguments.id") or not isValid("numeric", arguments.id)){
             rtn.cmd.code = 300;
             rtn.cmd.message = "User ID parameter is not valid";
@@ -301,6 +276,8 @@ component restpath="/users" rest="true"{
             hashedPassword = application.crypto.computeHash(arguments.password, salt);
         }
 
+        searchColumns = ["username", "lname","fname", "addr1", "addr2", "city", "state", "zip", "country", "phone", "phone2", "email"];
+
         try {
             include "users/sql_u_users_01.cfm";
 
@@ -312,7 +289,7 @@ component restpath="/users" rest="true"{
                 return rtn;
             }
 
-            var usr = {};
+            usr = {};
             usr.id = s_users.user_id;
             for(jj=1; jj lte arrayLen(searchColumns); jj=jj+1) {
                 targetColumn = searchColumns[jj];
@@ -333,21 +310,7 @@ component restpath="/users" rest="true"{
         return rtn;
     }
 
-    remote any function usersDelete(string user_id=0 restargsource="Header",
-                                    string session_id=0 restargsource="Header",
-                                    string id restargsource="Path") httpmethod="DELETE" restpath="{id}" {
-        var rtn = {};
-        rtn.users = [];
-        rtn.cmd = {};
-        rtn.cmd.code = 200;
-
-        var user = application.security.validateSession(arguments.user_id, arguments.session_id);
-
-        if(user.user_id lte 0) {
-            rtn.cmd.code = 301;
-            rtn.cmd.message = "Unauthorized Session";
-            return rtn;
-        }
+    remote any function usersDelete(string id restargsource="Path") httpmethod="DELETE" restpath="{id}" {
 
         if(not isValid("numeric", arguments.id)){
             rtn = {};
@@ -357,6 +320,12 @@ component restpath="/users" rest="true"{
             rtn.cmd.message = "Invalid ID";
             return rtn;
         }
+
+        rtn = {};
+        rtn.users = [];
+        rtn.cmd = {};
+        rtn.cmd.method = "DELETE";
+        rtn.code = 200;
 
         arguments.status_cde = 'Z';
 

@@ -22,7 +22,6 @@ component  {
 		}
 
         application.Security = createObject('component', 'services.arch.Security');
-        application.AuditLogger = createObject('component', 'services.arch.Audit');
 		return true;
 	}
 	private void function reloadApp() {

@@ -29,3 +29,8 @@
 "ERROR","web-0","12/25/2013","20:53:46","","key [ADDR2] doesn't exist (existing keys:lname,phone2,country,zip,fname,state,addr1,city,phone,username,email)"
 "ERROR","web-0","12/25/2013","21:06:18","","you can't use the same attribute [restargsource] twice"
 "ERROR","web-0","12/25/2013","21:08:24","","Missing [;] or [line feed] after expression"
+"ERROR","web-0","12/26/2013","13:20:50","","if statement must end with a [)]"
+"ERROR","web-0","12/26/2013","13:22:35","","if statement must end with a [)]"
+"ERROR","web-0","12/26/2013","13:23:44","","if statement must end with a [)]"
+"ERROR","web-0","12/26/2013","13:32:50","","undefined tag [cfhttparam]"
+"ERROR","web-0","12/27/2013","12:30:58","","Missing [;] or [line feed] after expression"

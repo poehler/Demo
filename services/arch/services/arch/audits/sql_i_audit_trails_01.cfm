@@ -19,8 +19,8 @@
 </fusedoc>
 --->
 <cftry>
-    <cfif not isValid("numeric", arguments.user_id)>
-        <cfset arguments.user_id = 0>
+    <cfif not isValid("numeric", arguments.usr_id)>
+        <cfset arguments.usr_id = 0>
     </cfif>
     <cfif not isDefined("arguments.location_id") or not isValid("numeric", arguments.location_id)>
         <cfset arguments.location_id = 0>
@@ -34,35 +34,19 @@
     <cfif not isDefined("arguments.channel_id") or not isValid("numeric", arguments.channel_id)>
         <cfset arguments.channel_id = 0>
     </cfif>
-    <cfsavecontent variable="goob">
-        <cfoutput>
-insert into audit_messages
-       (user_id, type, msg, location_id, gateway_id, device_id, channel_id, audit_date)
-values ('#arguments.user_id#',
-        '#arguments.type#',
-        '#left(arguments.message, 5000)#',
-        '#arguments.location_id#',
-        '#arguments.gateway_id#',
-        '#arguments.device_id#',
-        '#arguments.channel_id#',
-        now())
-        </cfoutput>
-    </cfsavecontent>
     <cfquery name="i_audit_messages" datasource="#application.datasource#">
 insert into audit_messages
-       (user_id, type, msg, location_id, gateway_id, device_id, channel_id, audit_date)
-values (<cfqueryparam value="#arguments.user_id#" cfsqltype="CF_SQL_BIGINT">,
+       (usr_id, type, msg, location_id, gateway_id, device_id, channel_id)
+values (<cfqueryparam value="#arguments.usr_id#" cfsqltype="CF_SQL_BIGINT">,
         <cfqueryparam value="#arguments.type#" cfsqltype="CF_SQL_VARCHAR">,
         <cfqueryparam value="#left(arguments.message, 5000)#" cfsqltype="CF_SQL_VARCHAR">,
         <cfqueryparam value="#arguments.location_id#" cfsqltype="CF_SQL_BIGINT">,
         <cfqueryparam value="#arguments.gateway_id#" cfsqltype="CF_SQL_BIGINT">,
         <cfqueryparam value="#arguments.device_id#" cfsqltype="CF_SQL_BIGINT">,
-        <cfqueryparam value="#arguments.channel_id#" cfsqltype="CF_SQL_BIGINT">,
-        now())
+        <cfqueryparam value="#arguments.channel_id#" cfsqltype="CF_SQL_BIGINT">)
     </cfquery>
 
 <cfcatch>
-    <cfdump var="#cfcatch#">
     <cfthrow message="#getFileFromPath(getCurrentTemplatePath())# #cfcatch.message#"
              detail="#cfcatch.detail#">
 </cfcatch>
